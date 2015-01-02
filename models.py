@@ -1,7 +1,8 @@
 """Models for the case application."""
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from flask.ext.sqlalchemy import SQLAlchemy
 
-from app import db
+db = SQLAlchemy()
 
 friends_relationships = db.Table(
     'friends',
