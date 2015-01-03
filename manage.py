@@ -1,6 +1,6 @@
 """Application management utility script."""
 import os
-from flask.ext.script import Manager
+from flask.ext.script import Manager, Shell
 from flask.ext.migrate import Migrate, MigrateCommand
 
 import models
@@ -22,6 +22,12 @@ def test():
 
     return pytest.main(['test', '--verbose'])
 
+
+def mk_context():
+    """Creating a shell context."""
+    return dict(app=app, db=db, models=models)
+
+manager.add_command('shell', Shell(make_context=mk_context, use_ipython=True))
 manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
