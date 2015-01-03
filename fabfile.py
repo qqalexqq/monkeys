@@ -21,7 +21,7 @@ def prepare_heroku(remote_name='production'):
 def prepare_deployment():
     commit_comment = prompt('Enter your git commit comment: ')
 
-    # TODO: add testing
+    local('python manage.py test')
     local('pip freeze > requirements.txt')
     local('git add -A')
     local('git commit -m "{0}"'.format(commit_comment))

@@ -14,6 +14,14 @@ app = create_app(
 migrate = Migrate(app, db)
 manager = Manager(app)
 
+
+@manager.command
+def test():
+    """Tests runner command."""
+    import pytest
+
+    return pytest.main(['test', '--verbose'])
+
 manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
