@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Monkeys{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<!-- Custom styles for this template -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Monkeys</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                {% for item in current_menu.children %}
+                    {% if item.active %}
+                    <li class="active"><a href="{{ item.url }}">{{ item.text }} <span class="sr-only">(current)</span></a></li>
+                    {% else %}
+                    <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% block main_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+&copy; Copyright 2015 by Aleksandr Mikheev
+{% endblock %}

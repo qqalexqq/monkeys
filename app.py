@@ -1,6 +1,10 @@
 """Monkeys app exercise."""
 import os
 from flask import Flask
+from flask.ext.bootstrap import Bootstrap
+from flask.ext.menu import Menu
+
+import views
 
 
 def create_app(name_handler, config_object):
@@ -13,6 +17,10 @@ def create_app(name_handler, config_object):
     from models import db
 
     db.init_app(app)
+    Bootstrap(app)
+    Menu(app)
+
+    app.register_blueprint(views.bp_monkey)
 
     return app
 
