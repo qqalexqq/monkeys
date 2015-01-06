@@ -1,6 +1,6 @@
 """Models for the case application."""
-from sqlalchemy.orm.collections import attribute_mapped_collection
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import event, DDL
 
 db = SQLAlchemy()
 
@@ -14,9 +14,13 @@ friends_relationships = db.Table(
 
 class Monkey(db.Model):
     __tablename__ = 'monkeys'
+    __table_args__ = (
+        db.Index('ix_monkey_name_id', 'name', 'id', unique=True),
+        db.Index('ix_monkey_fCount_id', 'friends_count', 'id', unique=True)
+    )
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(), nullable=False, index=True)
+    name = db.Column(db.String(), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(), nullable=False)
     friends = db.relationship(
@@ -25,16 +29,15 @@ class Monkey(db.Model):
         primaryjoin=(friends_relationships.c.monkey_id == id),
         secondaryjoin=(friends_relationships.c.friend_id == id),
         lazy='dynamic',
-        cascade='all',
-        collection_class=attribute_mapped_collection('name')
+        cascade='all'
     )
-    best_friend_id = db.Column(db.Integer, db.ForeignKey('monkeys.id'))
+    friends_count = db.Column(
+        db.Integer, default=0, server_onupdate=db.FetchedValue()
+    )
+    best_friend_id = db.Column(
+        db.Integer, db.ForeignKey('monkeys.id'), index=True
+    )
     best_friend = db.relationship('Monkey', uselist=False, remote_side=[id])
-
-    # TODO: rewrite using database triggers
-    @property
-    def friends_count(self):
-        return self.friends.count()
 
     def set_best_friend(self, monkey):
         if not self.is_best_friend(monkey):
@@ -79,3 +82,30 @@ class Monkey(db.Model):
 
     def __repr__(self):
         return '<Monkey #{0}>'.format(self.id)
+
+change_monkey_friends_count_trigger_ddl = DDL("""
+CREATE OR REPLACE FUNCTION process_change_monkey_friends_count()
+RETURNS TRIGGER AS $change_monkey_friends_count$
+    BEGIN
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE monkeys SET friends_count = friends_count - 1
+                WHERE id = OLD.monkey_id;
+            RETURN OLD;
+        ELSIF (TG_OP = 'INSERT') THEN
+            UPDATE monkeys SET friends_count = friends_count + 1
+                WHERE id = NEW.monkey_id;
+            RETURN NEW;
+        END IF;
+        RETURN NULL;
+    END;
+$change_monkey_friends_count$ LANGUAGE plpgsql;
+
+CREATE TRIGGER change_monkey_friends_count
+AFTER INSERT OR DELETE ON friends
+    FOR EACH ROW EXECUTE PROCEDURE process_change_monkey_friends_count();
+""")
+
+event.listen(
+    friends_relationships, 'after_create',
+    change_monkey_friends_count_trigger_ddl.execute_if(dialect='postgresql')
+)
