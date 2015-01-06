@@ -33,7 +33,7 @@ class TestMonkey:
         session.commit()
 
         assert_that(
-            M.query.filter('id={}'.format(monkey_ginger.id)).one().friends,
+            M.query.get(monkey_ginger.id).friends,
             has_item(monkey_john)
         )
 
@@ -41,7 +41,7 @@ class TestMonkey:
         session.commit()
 
         assert_that(
-            M.query.filter('id={}'.format(monkey_ginger.id)).one().friends,
+            M.query.get(monkey_ginger.id).friends,
             has_item(monkey_melissa)
         )
 
@@ -81,7 +81,7 @@ class TestMonkey:
 
         assert_that(
             monkey_ginger.friends.all(),
-            equal_to([monkey_john, monkey_melissa])
+            contains_inanyorder(monkey_john, monkey_melissa)
         )
 
         assert_that(monkey_ginger.best_friend, equal_to(monkey_john))
