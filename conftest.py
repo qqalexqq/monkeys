@@ -18,9 +18,12 @@ def app(request):
     ctx.pop()
 
 
-@pytest.yield_fixture(scope='session')
+# Function-wide because 'bind' parameter doesn't work in F-SQLA
+# https://github.com/mitsuhiko/flask-sqlalchemy/blob/2.0
+# /flask_sqlalchemy/__init__.py#L160
+@pytest.yield_fixture(scope='function')
 def db(app, request):
-    """Session-wide test database."""
+    """Function-wide test database."""
     _db.create_engine(
         app.config['SQLALCHEMY_DATABASE_URI'], convert_unicode=True
     )
@@ -35,8 +38,8 @@ def db(app, request):
 
 @pytest.yield_fixture(scope='function')
 def session(db, request):
-    db.session.begin_nested()
-
+    """Function-wide test database session"""
     yield db.session
 
-    db.session.rollback()
+    # Teardown
+    db.session.close()
