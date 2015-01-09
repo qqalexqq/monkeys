@@ -13,6 +13,6 @@
 	<dt>Best friend:</dt><dd><a href="{{ url_for('.view_monkey', id=monkey.best_friend.id) }}">{{ monkey.best_friend.name }}</a></dd>
 	{% endif %}
 	<br>
-	<dt>Actions:</dt><dd><a href="{{ url_for('.edit_monkey', id=monkey.id) }}">Edit</a></dd>
+	<dt>Actions:</dt><dd><a href="{{ url_for('.edit_monkey', id=monkey.id) }}">Edit</a> | <a href="{{ url_for('.delete_monkey', id=monkey.id) }}">Delete</a></dd>
 </dl>
 {% endblock %}

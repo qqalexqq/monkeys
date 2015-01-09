@@ -1,0 +1,16 @@
+{% extends "_template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Delete monkey &mdash; {{ super() }}{% endblock %}
+
+{% block main_content %}
+<h1 class="page-header">Delete monkey</h1>
+<dl>
+	<h3>Monkey to be deleted:</h3>
+	<dt>Name:</dt><dd>{{ monkey.name }}</dd>
+	<dt>Age</dt><dd>{{ monkey.age }}</dd>
+	<dt>Email</dt><dd>{{ monkey.email }}</dd>
+	<br>
+	<a href="{{ url_for('.delete_monkey_confirm', id=monkey.id) }}"  class="btn btn-danger" aria-expanded="false">Confirm delete</a>
+</dl>
+{% endblock %}

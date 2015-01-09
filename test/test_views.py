@@ -87,3 +87,45 @@ def test_edit_monkey(client, session):
 
     assert_that(request.status_code, equal_to(200))
     assert_that(request.data, contains_string('Invalid email address'))
+
+
+def test_delete_monkey(client, session):
+    monkey = M(name='John', age=2, email='john.doe@gmail.tt')
+
+    session.add(monkey)
+    session.commit()
+
+    request = client.get('/monkey/{0}/delete'.format(monkey.id))
+
+    assert_that(
+        request.data,
+        contains_string('Monkey to be deleted:')
+    )
+
+    assert_that(
+        request.data,
+        contains_string('john.doe@gmail.tt')
+    )
+
+
+def test_delete_monkey_confirm(client, session):
+    monkey = M(name='Melissa', age=19, email='granny@yahoo.club')
+
+    session.add(monkey)
+    session.commit()
+
+    request = client.get(
+        '/monkey/{0}/delete/confirm'.format(monkey.id), follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(
+        request.data,
+        contains_string('{0} was succesfully deleted.'.format(monkey.name))
+    )
+
+    request = client.get(
+        '/monkey/{0}/delete/confirm'.format(-1), follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(404))
