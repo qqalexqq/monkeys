@@ -1,5 +1,6 @@
 """Monkeys app exercise."""
 import os
+import logging
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.menu import Menu
@@ -22,13 +23,11 @@ def create_app(name_handler, config_object):
 
     app.register_blueprint(views.bp_monkey)
 
+    if os.environ.get('HEROKU') is not None:
+        stream_handler = logging.StreamHandler()
+
+        app.logger.addHandler(stream_handler)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Application startup')
+
     return app
-
-
-# We run app when this script is executed directly
-if __name__ == '__main__':
-    app = create_app(
-        __name__, os.environ.get('APP_SETTINGS', 'config.DevelopmentConfig')
-    )
-
-    app.run()

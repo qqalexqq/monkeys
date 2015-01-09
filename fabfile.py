@@ -14,6 +14,10 @@ def prepare_heroku(remote_name='production'):
         'heroku config:set APP_SETTINGS=config.{0}Config --remote {1}'
         .format(config_type, remote_name)
     )
+    local(
+        'heroku config:set HEROKU=true --remote {1}'
+        .format(config_type, remote_name)
+    )
     local('heroku addons:add --app {0} heroku-postgresql'.format(app_name))
     local('heroku pg:promote --app {0} DATABASE_URL'.format(app_name))
 
@@ -31,4 +35,5 @@ def prepare_deployment():
 def deploy(remote_name='production'):
     local('heroku maintenance:on')
     local('git push {0} master'.format(remote_name))
+    local('heroku run python manage.py db upgrade')
     local('heroku maintenance:off')
