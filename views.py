@@ -183,11 +183,8 @@ def delete_monkey_confirm(id):
 def view_add_friend(monkey_id):
     global monkeys_per_page
 
-    best_friend = aliased(Monkey)
-    monkey = Monkey.query.outerjoin(best_friend, Monkey.best_friend).options(
+    monkey = Monkey.query.options(
         Load(Monkey).load_only(Monkey.name)
-        .contains_eager(Monkey.best_friend, alias=best_friend)
-        .load_only(best_friend.name)
     ).filter(Monkey.id == monkey_id).first()
 
     if monkey is None:
@@ -243,6 +240,37 @@ def add_friend(monkey_id, friend_id):
 
     flash(
         'Friend {0} added to monkey {1} friends.'
+        .format(friend.name, monkey.name)
+    )
+
+    return redirect(url_for(
+        '.view_add_friend', monkey_id=monkey_id, page=page_was
+    ))
+
+
+@bp_monkey.route('/best_friend/<int:monkey_id>/set/<int:friend_id>')
+def set_best_friend(monkey_id, friend_id):
+    page_was = request.args.get('page_was', 1, type=int)
+
+    monkey = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    friend = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == friend_id).first()
+
+    if friend is None:
+        abort(404)
+
+    monkey.set_best_friend(friend)
+    db.session.commit()
+
+    flash(
+        'Best friend {0} set for monkey {1}.'
         .format(friend.name, monkey.name)
     )
 

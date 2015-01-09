@@ -192,3 +192,18 @@ def test_add_friend(client, session):
         '{0} added to monkey {1} friends.'
         .format(monkey_john.name, monkey_melissa.name)
     ))
+
+
+def test_set_best_friend(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    request = client.get(
+        '/best_friend/{0}/set/{1}'.format(monkey_melissa.id, monkey_john.id),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(
+        'Best friend {0} set for monkey {1}.'
+        .format(monkey_john.name, monkey_melissa.name)
+    ))
