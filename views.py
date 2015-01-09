@@ -292,6 +292,37 @@ def add_friend(monkey_id, friend_id):
     ))
 
 
+@bp_monkey.route('/friend/<int:monkey_id>/delete/<int:friend_id>')
+def delete_friend(monkey_id, friend_id):
+    page_was = request.args.get('page_was', 1, type=int)
+
+    monkey = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    friend = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == friend_id).first()
+
+    if friend is None:
+        abort(404)
+
+    monkey.delete_friend(friend)
+    db.session.commit()
+
+    flash(
+        'Friend {0} deleted from monkey {1} friends.'
+        .format(friend.name, monkey.name)
+    )
+
+    return redirect(url_for(
+        '.view_friend_list', monkey_id=monkey_id, page=page_was
+    ))
+
+
 @bp_monkey.route('/best_friend/<int:monkey_id>/set/<int:friend_id>')
 def set_best_friend(monkey_id, friend_id):
     page_was = request.args.get('page_was', 1, type=int)

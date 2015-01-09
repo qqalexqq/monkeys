@@ -218,6 +218,24 @@ def test_add_friend(client, session):
     ))
 
 
+def test_delete_friend(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    monkey_ginger.add_friend(monkey_melissa)
+    session.commit()
+
+    request = client.get(
+        '/friend/{0}/delete/{1}'.format(monkey_ginger.id, monkey_melissa.id),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(
+        '{0} deleted from monkey {1} friends.'
+        .format(monkey_melissa.name, monkey_ginger.name)
+    ))
+
+
 def test_set_best_friend(client, session):
     monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
 
