@@ -350,5 +350,36 @@ def set_best_friend(monkey_id, friend_id):
     )
 
     return redirect(url_for(
-        '.view_add_friend', monkey_id=monkey_id, page=page_was
+        '.view_friend_list', monkey_id=monkey_id, page=page_was
+    ))
+
+
+@bp_monkey.route('/best_friend/<int:monkey_id>/unset/<int:friend_id>')
+def unset_best_friend(monkey_id, friend_id):
+    page_was = request.args.get('page_was', 1, type=int)
+
+    monkey = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    friend = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == friend_id).first()
+
+    if friend is None:
+        abort(404)
+
+    monkey.unset_best_friend()
+    db.session.commit()
+
+    flash(
+        'Best friend {0} unset for monkey {1}.'
+        .format(friend.name, monkey.name)
+    )
+
+    return redirect(url_for(
+        '.view_friend_list', monkey_id=monkey_id, page=page_was
     ))

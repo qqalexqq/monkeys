@@ -249,3 +249,21 @@ def test_set_best_friend(client, session):
         'Best friend {0} set for monkey {1}.'
         .format(monkey_john.name, monkey_melissa.name)
     ))
+
+
+def test_unset_best_friend(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    monkey_melissa.set_best_friend(monkey_john)
+    session.commit()
+
+    request = client.get(
+        '/best_friend/{0}/unset/{1}'.format(monkey_melissa.id, monkey_john.id),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(
+        'Best friend {0} unset for monkey {1}.'
+        .format(monkey_john.name, monkey_melissa.name)
+    ))
