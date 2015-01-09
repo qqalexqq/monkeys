@@ -14,3 +14,7 @@ def test_production_config():
         equal_to(os.environ['DATABASE_URL'])
     )
     assert_that(app.config['SQLALCHEMY_ECHO'], is_(False))
+    assert_that(app.config['WTF_CSRF_ENABLED'], is_(True))
+    assert_that(
+        app.config['SECRET_KEY'], not(equal_to_ignoring_whitespace(''))
+    )

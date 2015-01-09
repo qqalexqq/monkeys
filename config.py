@@ -7,6 +7,8 @@ class Config(object):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     SQLALCHEMY_ECHO = False
+    WTF_CSRF_ENABLED = True
+    SECRET_KEY = 'qJzAVBeePEomvo7GpRWHeLFpMN4m'
 
 
 class ProductionConfig(Config):
@@ -32,3 +34,4 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'TEST_DATABASE_URL', 'postgresql://localhost/monkeys_test'
     )
+    WTF_CSRF_ENABLED = False

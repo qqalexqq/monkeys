@@ -43,3 +43,12 @@ def session(db, request):
 
     # Teardown
     db.session.close()
+
+
+@pytest.yield_fixture(scope='function')
+def client(app, session):
+    """Function-wide test app client"""
+    client = app.test_client(use_cookies=True)
+
+    # Teardown
+    yield client

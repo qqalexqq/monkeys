@@ -1,0 +1,16 @@
+{% extends "_template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Monkey info &mdash; {{ super() }}{% endblock %}
+
+{% block main_content %}
+<h1 class="page-header">Monkey info</h1>
+<dl>
+	<dt>Name:</dt><dd>{{ monkey.name }}</dd>
+	<dt>Age</dt><dd>{{ monkey.age }}</dd>
+	<dt>Email</dt><dd>{{ monkey.email }}</dd>
+	{% if monkey.best_friend: %}
+	<dt>Best friend:</dt><dd><a href="{{ url_for('.view_monkey', id=monkey.best_friend.id) }}">{{ monkey.best_friend.name }}</a></dd>
+	{% endif %}
+</dl>
+{% endblock %}
