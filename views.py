@@ -56,3 +56,39 @@ def add_monkey():
             monkey_form.validate_on_submit()
 
     return render_template('add_monkey.html', monkey_form=monkey_form)
+
+
+@bp_monkey.route('/monkey/<int:id>/edit', methods=['GET', 'POST'])
+def edit_monkey(id):
+    monkey = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
+    ).filter(Monkey.id == id).first()
+
+    if monkey is None:
+        abort(404)
+
+    if request.method == 'POST':
+        monkey_form = MonkeyForm()
+
+        if monkey_form.validate():
+            data = dict(monkey_form.data.items())
+
+            del data['id']
+            del data['submit_button']
+
+            monkey = Monkey(**data)
+
+            db.session.add(monkey)
+            db.session.commit()
+
+            flash('Monkey was succesfully edited.')
+
+            return redirect(url_for('.view_monkey', id=monkey.id))
+        else:
+            monkey_form.validate_on_submit()
+    else:
+        monkey_form = MonkeyForm(**monkey.__dict__)
+
+    return render_template(
+        'edit_monkey.html', monkey=monkey, monkey_form=monkey_form
+    )

@@ -47,3 +47,43 @@ def test_add_monkey(client, session):
 
     assert_that(request.status_code, equal_to(200))
     assert_that(request.data, contains_string('Not a valid integer value'))
+
+
+def test_edit_monkey(client, session):
+    data = dict(name='Melissa', age=19, email='granny@yahoo.club')
+
+    monkey = M(**data)
+    session.add(monkey)
+    session.commit()
+
+    request = client.get('/monkey/{0}/edit'.format(monkey.id))
+
+    assert_that(
+        request.data,
+        contains_string('Edit monkey')
+    )
+
+    assert_that(
+        request.data,
+        contains_string('granny@yahoo.club')
+    )
+
+    data['age'] = 20
+    request = client.post(
+        '/monkey/{0}/edit'.format(monkey.id),
+        data=data, follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string('Melissa'))
+    assert_that(request.data, contains_string('granny@yahoo.club'))
+    assert_that(request.data, contains_string('20'))
+
+    data['email'] = 123
+    request = client.post(
+        '/monkey/{0}/edit'.format(monkey.id),
+        data=data, follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string('Invalid email address'))

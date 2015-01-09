@@ -1,0 +1,13 @@
+{% extends "_template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Edit monkey {{ monkey.name }} &mdash; {{ super() }}{% endblock %}
+
+{% block main_content %}
+<h1 class="page-header">Edit monkey {{ monkey.name }}</h1>
+{{ wtf.form_errors(monkey_form, hiddens='only') }}
+{{ wtf.quick_form(
+	monkey_form, action=url_for('.edit_monkey', id=monkey.id), form_type="horizontal",
+	horizontal_columns=("lg", 1, 11), button_map={'submit_button': 'primary'}
+) }}
+{% endblock %}
