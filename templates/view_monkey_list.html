@@ -1,1 +1,69 @@
 {% extends "_template.html" %}
+{% block title %}Monkeys list &mdash; {{ super() }}{% endblock %}
+
+{% block main_content %}
+<h1 class="page-header">Monkeys list</h1>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            {% for field, field_sort_asc in fields_order.iteritems() %}
+                <th style="min-width: 100px;">
+                    <a href="{{ url_for('.view_monkey_list', sort_by=field, sort_asc=field_sort_asc) }}">
+                        {{ field.capitalize().replace('_', ' ').replace('.', ' ') }}
+                    </a>
+                    {% if sort_by == field %}
+                        {{ '&uarr;' | safe if sort_asc else '&darr;' | safe }}
+                    {% endif %}
+                </th>
+            {% endfor %}
+                <th style="min-width: 100px;">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for monkey in paginate.items %}
+            <tr>
+                <td><a href="{{ url_for('.view_monkey', id=monkey.id) }}">{{ monkey.name }}</a></td>
+                <td>{{ monkey.best_friend.name }}</td>
+                <td>{{ monkey.friends_count }}</td>
+                <td>
+                    <a href="{{ url_for('.edit_monkey', id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-pencil"></span></a>
+                    <a href="{{ url_for('.delete_monkey', id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-trash" style="color: red;"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<ul class="pager">
+    {% if paginate.has_prev %}
+    <li class="previous">
+        <a href="{{ url_for('.view_monkey_list', sort_by=sort_by, sort_asc=sort_asc, page=paginate.prev_num) }}">
+            &larr; Previous page
+        </a>
+    </li>
+    {% else %}
+    <li class="previous disabled">
+        <a href="javascript: void(0);">
+            &larr; Previous page
+        </a>
+    </li>
+    {% endif %}
+    </li>
+    {% if paginate.has_next %}
+    <li class="next">
+        <a href="{{ url_for('.view_monkey_list', sort_by=sort_by, sort_asc=sort_asc, page=paginate.next_num) }}">
+            Next page &rarr;
+        </a>
+    </li>
+    {% else %}
+    <li class="next disabled">
+        <a href="javascript: void(0);">
+            Next page &rarr;
+        </a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}

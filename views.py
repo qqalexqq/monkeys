@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from flask import (
     Blueprint, render_template, request, flash, redirect, url_for, abort
 )
@@ -8,6 +9,9 @@ from sqlalchemy.orm.strategy_options import Load
 from models import *
 from forms import *
 
+# 5 for easier testing purposes
+monkeys_per_page = 5
+
 bp_monkey = Blueprint('monkey', __name__)
 
 
@@ -16,7 +20,58 @@ bp_monkey = Blueprint('monkey', __name__)
 @bp_monkey.route('/')
 @menu.register_menu(bp_monkey, '.view_monkey_list', 'Monkeys list', order=0)
 def view_monkey_list():
-    return render_template('view_monkey_list.html')
+    global monkeys_per_page
+
+    sort_by = request.args.get('sort_by', 'name', type=str)
+    sort_asc_str = request.args.get('sort_asc', None, type=str)
+    page = request.args.get('page', 1, type=int)
+
+    fields_order = OrderedDict([
+        ('name', True),
+        ('best_friend.name', True),
+        ('friends_count', False)
+    ])
+
+    sort_asc = None if sort_asc_str is None else sort_asc_str == 'True'
+
+    if sort_by not in fields_order or sort_asc is None:
+        sort_by = 'name'
+        sort_asc = fields_order[sort_by]
+
+    fields_order[sort_by] = not sort_asc
+
+    best_friend = aliased(Monkey)
+    # Hack. Can be fixed by denormalization
+    if sort_by != 'best_friend.name':
+        monkeys_order_by = getattr(Monkey, sort_by)
+    else:
+        monkeys_order_by = getattr(best_friend, 'name')
+
+    paginate = Monkey.query.outerjoin(best_friend, Monkey.best_friend).options(
+        Load(Monkey).load_only(Monkey.name, Monkey.friends_count)
+        .contains_eager(Monkey.best_friend, alias=best_friend)
+        .load_only(best_friend.name)
+    ).order_by(
+        getattr(monkeys_order_by, 'asc' if sort_asc else 'desc')()
+    ).paginate(
+        page, per_page=monkeys_per_page, error_out=False
+    )
+
+    if not paginate.items and paginate.total > 0:
+        new_page = paginate.pages
+
+        return redirect(url_for(
+            '.view_monkey_list', sort_by=sort_by, sort_asc=sort_asc,
+            page=new_page
+        ))
+
+    return render_template(
+        'view_monkey_list.html',
+        fields_order=fields_order,
+        sort_by=sort_by,
+        sort_asc=sort_asc,
+        paginate=paginate
+    )
 
 
 @bp_monkey.route('/monkey/<int:id>')

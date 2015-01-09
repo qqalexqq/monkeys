@@ -4,6 +4,29 @@ from models import Monkey as M
 from test_models import create_monkeys
 
 
+def test_view_monkey_list(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    monkey_john.add_friend(monkey_melissa)
+    session.commit()
+
+    request = client.get('/')
+
+    assert_that(request.status_code, equal_to(200))
+
+    for monkey in (monkey_ginger, monkey_john, monkey_melissa):
+        assert_that(request.data, contains_string(monkey.name))
+        assert_that(request.data, contains_string(str(monkey.friends_count)))
+
+    request = client.get('/?page={0}'.format(100), follow_redirects=True)
+
+    assert_that(request.status_code, equal_to(200))
+
+    for monkey in (monkey_ginger, monkey_john, monkey_melissa):
+        assert_that(request.data, contains_string(monkey.name))
+        assert_that(request.data, contains_string(str(monkey.friends_count)))
+
+
 def test_view_monkey(client, session):
     monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
 
