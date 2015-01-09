@@ -76,7 +76,7 @@ class TestMonkey:
 
         assert_that(monkey_ginger.best_friend_id, equal_to(monkey_melissa.id))
 
-        monkey_ginger.unset_bestfriend()
+        monkey_ginger.unset_best_friend()
         monkey_ginger.set_best_friend(monkey_john)
 
         assert_that(

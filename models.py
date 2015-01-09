@@ -46,7 +46,7 @@ class Monkey(db.Model):
 
         return self
 
-    def unset_bestfriend(self):
+    def unset_best_friend(self):
         self.best_friend_id = None
 
         return self
