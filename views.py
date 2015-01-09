@@ -5,6 +5,7 @@ from flask import (
 from flask.ext import menu
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.strategy_options import Load
+from sqlalchemy.sql.expression import select
 
 from models import *
 from forms import *
@@ -176,3 +177,75 @@ def delete_monkey_confirm(id):
     flash('Monkey {0} was succesfully deleted.'.format(monkey.name))
 
     return redirect(url_for('.view_monkey_list'))
+
+
+@bp_monkey.route('/friend/<int:monkey_id>/add')
+def view_add_friend(monkey_id):
+    global monkeys_per_page
+
+    best_friend = aliased(Monkey)
+    monkey = Monkey.query.outerjoin(best_friend, Monkey.best_friend).options(
+        Load(Monkey).load_only(Monkey.name)
+        .contains_eager(Monkey.best_friend, alias=best_friend)
+        .load_only(best_friend.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    page = request.args.get('page', 1, type=int)
+
+    paginate = Monkey.query.filter(~(Monkey.id.in_(select(
+        [friends_relationships.c.friend_id],
+        friends_relationships.c.monkey_id == monkey_id
+    ))), Monkey.id != monkey_id).options(
+        Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
+    ).order_by(
+        Monkey.name.asc()
+    ).paginate(
+        page, per_page=monkeys_per_page, error_out=False
+    )
+
+    if not paginate.items and paginate.total > 0:
+        new_page = paginate.pages
+
+        return redirect(url_for(
+            '.view_add_friend', monkey_id=monkey_id, page=new_page
+        ))
+
+    return render_template(
+        'view_add_friend.html',
+        monkey=monkey,
+        paginate=paginate
+    )
+
+
+@bp_monkey.route('/friend/<int:monkey_id>/add/<int:friend_id>')
+def add_friend(monkey_id, friend_id):
+    page_was = request.args.get('page_was', 1, type=int)
+
+    monkey = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    friend = Monkey.query.options(
+        Load(Monkey).load_only(Monkey.name)
+    ).filter(Monkey.id == friend_id).first()
+
+    if friend is None:
+        abort(404)
+
+    monkey.add_friend(friend)
+    db.session.commit()
+
+    flash(
+        'Friend {0} added to monkey {1} friends.'
+        .format(friend.name, monkey.name)
+    )
+
+    return redirect(url_for(
+        '.view_add_friend', monkey_id=monkey_id, page=page_was
+    ))

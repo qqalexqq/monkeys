@@ -1,0 +1,69 @@
+{% extends "_template.html" %}
+{% block title %}Add friends for {{ monkey.name }} &mdash; {{ super() }}{% endblock %}
+
+{% block main_content %}
+<h1 class="page-header">Add friends for <a href="{{ url_for('.view_monkey', id=monkey.id) }}">{{ monkey.name }}</a></h1>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="min-width: 100px;">
+                    Name
+                </th>
+                <th style="min-width: 100px;">
+                    Age
+                </th>
+                <th style="min-width: 100px;">
+                    Email
+                </th>
+                <th style="min-width: 100px;">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for other_monkey in paginate.items %}
+            <tr>
+                <td><a href="{{ url_for('.view_monkey', id=other_monkey.id) }}">{{ other_monkey.name }}</a></td>
+                <td>{{ other_monkey.age }}</td>
+                <td>{{ other_monkey.email }}</td>
+                <td>
+                    <a href="{{ url_for('.add_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
+                        <span class="glyphicon glyphicon-thumbs-up" title="Add friend" aria-hidden="true"></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<ul class="pager">
+    {% if paginate.has_prev %}
+    <li class="previous">
+        <a href="{{ url_for('.view_add_friend', monkey_id=monkey.id, page=paginate.prev_num) }}">
+            &larr; Previous page
+        </a>
+    </li>
+    {% else %}
+    <li class="previous disabled">
+        <a href="javascript: void(0);">
+            &larr; Previous page
+        </a>
+    </li>
+    {% endif %}
+    </li>
+    {% if paginate.has_next %}
+    <li class="next">
+        <a href="{{ url_for('.view_add_friend', monkey_id=monkey.id, page=paginate.next_num) }}">
+            Next page &rarr;
+        </a>
+    </li>
+    {% else %}
+    <li class="next disabled">
+        <a href="javascript: void(0);">
+            Next page &rarr;
+        </a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}

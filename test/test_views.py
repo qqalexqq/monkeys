@@ -152,3 +152,43 @@ def test_delete_monkey_confirm(client, session):
     )
 
     assert_that(request.status_code, equal_to(404))
+
+
+def test_view_add_friend(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    request = client.get('/friend/{0}/add'.format(monkey_melissa.id))
+
+    assert_that(request.status_code, equal_to(200))
+
+    for monkey in (monkey_ginger, monkey_john):
+        assert_that(request.data, contains_string(monkey.name))
+        assert_that(request.data, contains_string(str(monkey.age)))
+        assert_that(request.data, contains_string(monkey.email))
+
+    request = client.get(
+        '/friend/{0}/add?page={0}'.format(monkey_melissa.id, 100),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+
+    for monkey in (monkey_ginger, monkey_john):
+        assert_that(request.data, contains_string(monkey.name))
+        assert_that(request.data, contains_string(str(monkey.age)))
+        assert_that(request.data, contains_string(monkey.email))
+
+
+def test_add_friend(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    request = client.get(
+        '/friend/{0}/add/{1}'.format(monkey_melissa.id, monkey_john.id),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(
+        '{0} added to monkey {1} friends.'
+        .format(monkey_john.name, monkey_melissa.name)
+    ))
