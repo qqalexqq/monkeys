@@ -10,6 +10,15 @@ from sqlalchemy.sql.expression import select
 from models import *
 from forms import *
 
+
+def fix_page_number_overflow(paginate, route_name, **kwargs):
+    if not paginate.items and paginate.total > 0:
+        new_page = paginate.pages
+
+        return redirect(url_for(
+            route_name, page=new_page, **kwargs
+        ))
+
 # 5 for easier testing purposes
 monkeys_per_page = 5
 
@@ -58,13 +67,12 @@ def view_monkey_list():
         page, per_page=monkeys_per_page, error_out=False
     )
 
-    if not paginate.items and paginate.total > 0:
-        new_page = paginate.pages
+    new_url = fix_page_number_overflow(
+        paginate, '.view_monkey_list', sort_by=sort_by, sort_asc=sort_asc
+    )
 
-        return redirect(url_for(
-            '.view_monkey_list', sort_by=sort_by, sort_asc=sort_asc,
-            page=new_page
-        ))
+    if new_url:
+        return new_url
 
     return render_template(
         'view_monkey_list.html',
@@ -179,6 +187,42 @@ def delete_monkey_confirm(id):
     return redirect(url_for('.view_monkey_list'))
 
 
+@bp_monkey.route('/friend/<int:monkey_id>')
+def view_friend_list(monkey_id):
+    global monkeys_per_page
+
+    page = request.args.get('page', 1, type=int)
+
+    best_friend = aliased(Monkey)
+    monkey = Monkey.query.outerjoin(best_friend, Monkey.best_friend).options(
+        Load(Monkey).load_only(Monkey.name)
+        .contains_eager(Monkey.best_friend, alias=best_friend)
+        .load_only(best_friend.name)
+    ).filter(Monkey.id == monkey_id).first()
+
+    if monkey is None:
+        abort(404)
+
+    paginate = monkey.friends.options(
+        Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
+    ).order_by(
+        Monkey.name.asc()
+    ).paginate(
+        page, per_page=monkeys_per_page, error_out=False
+    )
+
+    new_url = fix_page_number_overflow(
+        paginate, '.view_friend_list', monkey_id=monkey_id
+    )
+
+    if new_url:
+        return new_url
+
+    return render_template(
+        'view_friend_list.html', monkey=monkey, paginate=paginate
+    )
+
+
 @bp_monkey.route('/friend/<int:monkey_id>/add')
 def view_add_friend(monkey_id):
     global monkeys_per_page
@@ -203,12 +247,12 @@ def view_add_friend(monkey_id):
         page, per_page=monkeys_per_page, error_out=False
     )
 
-    if not paginate.items and paginate.total > 0:
-        new_page = paginate.pages
+    new_url = fix_page_number_overflow(
+        paginate, '.view_add_friend', monkey_id=monkey_id
+    )
 
-        return redirect(url_for(
-            '.view_add_friend', monkey_id=monkey_id, page=new_page
-        ))
+    if new_url:
+        return new_url
 
     return render_template(
         'view_add_friend.html',

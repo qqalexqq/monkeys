@@ -154,6 +154,30 @@ def test_delete_monkey_confirm(client, session):
     assert_that(request.status_code, equal_to(404))
 
 
+def test_view_friend_list(client, session):
+    monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
+
+    monkey_john.add_friend(monkey_melissa)
+    session.commit()
+
+    request = client.get('/friend/{0}'.format(monkey_john.id))
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(monkey_melissa.name))
+    assert_that(request.data, contains_string(str(monkey_melissa.age)))
+    assert_that(request.data, contains_string(monkey_melissa.email))
+
+    request = client.get(
+        '/friend/{0}?page={1}'.format(monkey_john.id, 100),
+        follow_redirects=True
+    )
+
+    assert_that(request.status_code, equal_to(200))
+    assert_that(request.data, contains_string(monkey_melissa.name))
+    assert_that(request.data, contains_string(str(monkey_melissa.age)))
+    assert_that(request.data, contains_string(monkey_melissa.email))
+
+
 def test_view_add_friend(client, session):
     monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
 
