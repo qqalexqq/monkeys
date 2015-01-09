@@ -25,12 +25,12 @@
         <tbody>
         {% for monkey in paginate.items %}
             <tr>
-                <td><a href="{{ url_for('.view_monkey', id=monkey.id) }}">{{ monkey.name }}</a></td>
+                <td><a href="{{ url_for('.view_monkey', monkey_id=monkey.id) }}">{{ monkey.name }}</a></td>
                 <td>{{ monkey.best_friend.name }}</td>
                 <td>{{ monkey.friends_count }}</td>
                 <td>
-                    <a href="{{ url_for('.edit_monkey', id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-pencil"></span></a>
-                    <a href="{{ url_for('.delete_monkey', id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-trash" style="color: red;"></span></a>
+                    <a href="{{ url_for('.edit_monkey', monkey_id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-pencil" title="Edit monkey"></span></a>
+                    <a href="{{ url_for('.delete_monkey', monkey_id=monkey.id) }}"><span aria-hidden="true" class="glyphicon glyphicon-trash" style="color: red;" title="Delete monkey"></span></a>
                 </td>
             </tr>
         {% endfor %}

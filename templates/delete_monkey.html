@@ -11,6 +11,6 @@
 	<dt>Age</dt><dd>{{ monkey.age }}</dd>
 	<dt>Email</dt><dd>{{ monkey.email }}</dd>
 	<br>
-	<a href="{{ url_for('.delete_monkey_confirm', id=monkey.id) }}"  class="btn btn-danger" aria-expanded="false">Confirm delete</a>
+	<a href="{{ url_for('.delete_monkey_confirm', monkey_id=monkey.id) }}"  class="btn btn-danger" aria-expanded="false">Confirm delete</a>
 </dl>
 {% endblock %}

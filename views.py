@@ -83,14 +83,14 @@ def view_monkey_list():
     )
 
 
-@bp_monkey.route('/monkey/<int:id>')
-def view_monkey(id):
+@bp_monkey.route('/monkey/<int:monkey_id>')
+def view_monkey(monkey_id):
     best_friend = aliased(Monkey)
     monkey = Monkey.query.outerjoin(best_friend, Monkey.best_friend).options(
         Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
         .contains_eager(Monkey.best_friend, alias=best_friend)
         .load_only(best_friend.name)
-    ).filter(Monkey.id == id).first()
+    ).filter(Monkey.id == monkey_id).first()
 
     if monkey is None:
         abort(404)
@@ -117,18 +117,18 @@ def add_monkey():
 
             flash('Monkey was succesfully created.')
 
-            return redirect(url_for('.view_monkey', id=monkey.id))
+            return redirect(url_for('.view_monkey', monkey_id=monkey.id))
         else:
             monkey_form.validate_on_submit()
 
     return render_template('add_monkey.html', monkey_form=monkey_form)
 
 
-@bp_monkey.route('/monkey/<int:id>/edit', methods=['GET', 'POST'])
-def edit_monkey(id):
+@bp_monkey.route('/monkey/<int:monkey_id>/edit', methods=['GET', 'POST'])
+def edit_monkey(monkey_id):
     monkey = Monkey.query.options(
         Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
-    ).filter(Monkey.id == id).first()
+    ).filter(Monkey.id == monkey_id).first()
 
     if monkey is None:
         abort(404)
@@ -149,7 +149,7 @@ def edit_monkey(id):
 
             flash('Monkey was succesfully edited.')
 
-            return redirect(url_for('.view_monkey', id=monkey.id))
+            return redirect(url_for('.view_monkey', monkey_id=monkey.id))
         else:
             monkey_form.validate_on_submit()
     else:
@@ -160,11 +160,11 @@ def edit_monkey(id):
     )
 
 
-@bp_monkey.route('/monkey/<int:id>/delete')
-def delete_monkey(id):
+@bp_monkey.route('/monkey/<int:monkey_id>/delete')
+def delete_monkey(monkey_id):
     monkey = Monkey.query.options(
         Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
-    ).filter(Monkey.id == id).first()
+    ).filter(Monkey.id == monkey_id).first()
 
     if monkey is None:
         abort(404)
@@ -172,9 +172,9 @@ def delete_monkey(id):
     return render_template('delete_monkey.html', monkey=monkey)
 
 
-@bp_monkey.route('/monkey/<int:id>/delete/confirm')
-def delete_monkey_confirm(id):
-    monkey = Monkey.query.get(id)
+@bp_monkey.route('/monkey/<int:monkey_id>/delete/confirm')
+def delete_monkey_confirm(monkey_id):
+    monkey = Monkey.query.get(monkey_id)
 
     if monkey is None:
         abort(404)

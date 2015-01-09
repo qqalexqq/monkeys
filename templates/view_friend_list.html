@@ -2,7 +2,7 @@
 {% block title %}Friends of {{ monkey.name }} &mdash; {{ super() }}{% endblock %}
 
 {% block main_content %}
-<h1 class="page-header">Friends of <a href="{{ url_for('.view_monkey', id=monkey.id) }}">{{ monkey.name }}</a></h1>
+<h1 class="page-header">Friends of <a href="{{ url_for('.view_monkey', monkey_id=monkey.id) }}">{{ monkey.name }}</a></h1>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -24,7 +24,7 @@
         <tbody>
         {% for other_monkey in paginate.items %}
             <tr>
-                <td><a href="{{ url_for('.view_monkey', id=other_monkey.id) }}">{{ other_monkey.name }}</a></td>
+                <td><a href="{{ url_for('.view_monkey', monkey_id=other_monkey.id) }}">{{ other_monkey.name }}</a></td>
                 <td>{{ other_monkey.age }}</td>
                 <td>{{ other_monkey.email }}</td>
                 <td>
