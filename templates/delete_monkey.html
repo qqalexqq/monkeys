@@ -10,7 +10,10 @@
 	<dt>Name:</dt><dd>{{ monkey.name }}</dd>
 	<dt>Age</dt><dd>{{ monkey.age }}</dd>
 	<dt>Email</dt><dd>{{ monkey.email }}</dd>
-	<br>
-	<a href="{{ url_for('.delete_monkey_confirm', monkey_id=monkey.id) }}"  class="btn btn-danger" aria-expanded="false">Confirm delete</a>
 </dl>
+<form>
+	<button type="submit" formaction="{{ url_for('.delete_monkey', monkey_id=monkey.id) }}" formmethod="post" class="btn btn-danger">
+		Confirm delete
+	</button>
+</form>
 {% endblock %}

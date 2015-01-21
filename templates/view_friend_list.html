@@ -28,18 +28,20 @@
                 <td>{{ other_monkey.age }}</td>
                 <td>{{ other_monkey.email }}</td>
                 <td>
-                    {% if monkey.best_friend.id == other_monkey.id %}
-                    <a href="{{ url_for('.unset_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
-                        <span class="glyphicon glyphicon-heart" style="color: red;" title="Unset best friend" aria-hidden="true"></span>
-                    </a>
-                    {% else %}
-                    <a href="{{ url_for('.set_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
-                        <span class="glyphicon glyphicon-heart" title="Set as best friend" aria-hidden="true"></span>
-                    </a>
-                    {% endif %}
-                    <a href="{{ url_for('.delete_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
-                        <span class="glyphicon glyphicon-thumbs-down" title="Delete friend" aria-hidden="true"></span>
-                    </a>
+                    <form>
+                        {% if monkey.best_friend.id == other_monkey.id %}
+                        <button type="submit" formaction="{{ url_for('.unset_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}" formmethod="post" title="Unset best friend">
+                            <span class="glyphicon glyphicon-heart" style="color: red;" aria-hidden="true"></span>
+                        </button>
+                        {% else %}
+                        <button type="submit" formaction="{{ url_for('.set_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}" formmethod="post" title="Set as best friend">
+                            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>
+                        </button>
+                        {% endif %}
+                        <button type="submit" formaction="{{ url_for('.delete_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}" formmethod="post" title="Delete friend">
+                            <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+                        </button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}

@@ -137,8 +137,8 @@ def test_delete_monkey_confirm(client, session):
     session.add(monkey)
     session.commit()
 
-    request = client.get(
-        '/monkey/{0}/delete/confirm'.format(monkey.id), follow_redirects=True
+    request = client.post(
+        '/monkey/{0}/delete'.format(monkey.id), follow_redirects=True
     )
 
     assert_that(request.status_code, equal_to(200))
@@ -206,7 +206,7 @@ def test_view_add_friend(client, session):
 def test_add_friend(client, session):
     monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
 
-    request = client.get(
+    request = client.post(
         '/friend/{0}/add/{1}'.format(monkey_melissa.id, monkey_john.id),
         follow_redirects=True
     )
@@ -224,7 +224,7 @@ def test_delete_friend(client, session):
     monkey_ginger.add_friend(monkey_melissa)
     session.commit()
 
-    request = client.get(
+    request = client.post(
         '/friend/{0}/delete/{1}'.format(monkey_ginger.id, monkey_melissa.id),
         follow_redirects=True
     )
@@ -239,7 +239,7 @@ def test_delete_friend(client, session):
 def test_set_best_friend(client, session):
     monkey_ginger, monkey_john, monkey_melissa = create_monkeys(session)
 
-    request = client.get(
+    request = client.post(
         '/best_friend/{0}/set/{1}'.format(monkey_melissa.id, monkey_john.id),
         follow_redirects=True
     )
@@ -257,7 +257,7 @@ def test_unset_best_friend(client, session):
     monkey_melissa.set_best_friend(monkey_john)
     session.commit()
 
-    request = client.get(
+    request = client.post(
         '/best_friend/{0}/unset/{1}'.format(monkey_melissa.id, monkey_john.id),
         follow_redirects=True
     )

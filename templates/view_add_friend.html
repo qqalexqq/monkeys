@@ -28,12 +28,14 @@
                 <td>{{ other_monkey.age }}</td>
                 <td>{{ other_monkey.email }}</td>
                 <td>
-                    <a href="{{ url_for('.add_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
-                        <span class="glyphicon glyphicon-thumbs-up" title="Add friend" aria-hidden="true"></span>
-                    </a>
-                    <a href="{{ url_for('.set_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}">
-                        <span class="glyphicon glyphicon-heart" title="Set as best friend" aria-hidden="true"></span>
-                    </a>
+                    <form>
+                        <button type="submit" formaction="{{ url_for('.add_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}" formmethod="post" title="Add friend">
+                            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" formaction="{{ url_for('.set_best_friend', monkey_id=monkey.id, friend_id=other_monkey.id, page_was=paginate.page) }}" formmethod="post" title="Set as best friend">
+                            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>
+                        </button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}

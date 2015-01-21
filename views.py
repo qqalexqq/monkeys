@@ -160,31 +160,29 @@ def edit_monkey(monkey_id):
     )
 
 
-@bp_monkey.route('/monkey/<int:monkey_id>/delete')
+@bp_monkey.route('/monkey/<int:monkey_id>/delete', methods=['GET', 'POST'])
 def delete_monkey(monkey_id):
-    monkey = Monkey.query.options(
-        Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
-    ).filter(Monkey.id == monkey_id).first()
+    if request.method == 'POST':
+        monkey = Monkey.query.get(monkey_id)
 
-    if monkey is None:
-        abort(404)
+        if monkey is None:
+            abort(404)
 
-    return render_template('delete_monkey.html', monkey=monkey)
+        db.session.delete(monkey)
+        db.session.commit()
 
+        flash('Monkey {0} was succesfully deleted.'.format(monkey.name))
 
-@bp_monkey.route('/monkey/<int:monkey_id>/delete/confirm')
-def delete_monkey_confirm(monkey_id):
-    monkey = Monkey.query.get(monkey_id)
+        return redirect(url_for('.view_monkey_list'))
+    else:
+        monkey = Monkey.query.options(
+            Load(Monkey).load_only(Monkey.name, Monkey.age, Monkey.email)
+        ).filter(Monkey.id == monkey_id).first()
 
-    if monkey is None:
-        abort(404)
+        if monkey is None:
+            abort(404)
 
-    db.session.delete(monkey)
-    db.session.commit()
-
-    flash('Monkey {0} was succesfully deleted.'.format(monkey.name))
-
-    return redirect(url_for('.view_monkey_list'))
+        return render_template('delete_monkey.html', monkey=monkey)
 
 
 @bp_monkey.route('/friend/<int:monkey_id>')
@@ -261,7 +259,9 @@ def view_add_friend(monkey_id):
     )
 
 
-@bp_monkey.route('/friend/<int:monkey_id>/add/<int:friend_id>')
+@bp_monkey.route(
+    '/friend/<int:monkey_id>/add/<int:friend_id>', methods=['POST']
+)
 def add_friend(monkey_id, friend_id):
     page_was = request.args.get('page_was', 1, type=int)
 
@@ -292,7 +292,9 @@ def add_friend(monkey_id, friend_id):
     ))
 
 
-@bp_monkey.route('/friend/<int:monkey_id>/delete/<int:friend_id>')
+@bp_monkey.route(
+    '/friend/<int:monkey_id>/delete/<int:friend_id>', methods=['POST']
+)
 def delete_friend(monkey_id, friend_id):
     page_was = request.args.get('page_was', 1, type=int)
 
@@ -323,7 +325,9 @@ def delete_friend(monkey_id, friend_id):
     ))
 
 
-@bp_monkey.route('/best_friend/<int:monkey_id>/set/<int:friend_id>')
+@bp_monkey.route(
+    '/best_friend/<int:monkey_id>/set/<int:friend_id>', methods=['POST']
+)
 def set_best_friend(monkey_id, friend_id):
     page_was = request.args.get('page_was', 1, type=int)
 
@@ -350,11 +354,13 @@ def set_best_friend(monkey_id, friend_id):
     )
 
     return redirect(url_for(
-        '.view_friend_list', monkey_id=monkey_id, page=page_was
+        '.view_add_friend', monkey_id=monkey_id, page=page_was
     ))
 
 
-@bp_monkey.route('/best_friend/<int:monkey_id>/unset/<int:friend_id>')
+@bp_monkey.route(
+    '/best_friend/<int:monkey_id>/unset/<int:friend_id>', methods=['POST']
+)
 def unset_best_friend(monkey_id, friend_id):
     page_was = request.args.get('page_was', 1, type=int)
 
