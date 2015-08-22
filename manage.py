@@ -14,13 +14,25 @@ app = create_app(
 migrate = Migrate(app, db)
 manager = Manager(app)
 
+PYTEST_ARGS = ['--verbose', 'test']
+
 
 @manager.command
 def test():
     """Tests runner command."""
     import pytest
 
-    return pytest.main(['test', '--verbose'])
+    return pytest.main(PYTEST_ARGS)
+
+
+@manager.command
+def test_coverage():
+    """Tests coverage runner command."""
+    import pytest
+
+    return pytest.main(
+        ['--cov-report', 'term-missing', '--cov', './'] + PYTEST_ARGS
+    )
 
 
 def mk_context():
