@@ -24,7 +24,7 @@ Both `prepare_heroku` and `deploy` commands can take an argument, which will be 
 1. Clone this repo and into it:
 `git clone https://github.com/qqalexqq/monkeys && cd monkeys`
 2. Create virtual environment:
-`mkvirtualenv 'env_name' or `virtualenv 'env_name'`
+`mkvirtualenv 'env_name'` or `virtualenv 'env_name'`
 3. Source virtual environment:
 `. ''env_name''/bin/activate`
 4. Install dependencies into virtual environment:
