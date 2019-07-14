@@ -30,12 +30,19 @@ Both `prepare_heroku` and `deploy` commands can take an argument, which will be 
 4. Install dependencies into virtual environment:
 `pip install -r requirements.txt`
 5. Create development and testing databases in Postgres (psql):
-`CREATE DATABASE ''database_name''
-`CREATE DATABASE ''test_database_name''
+
+`CREATE DATABASE ''database_name''`
+
+`CREATE DATABASE ''test_database_name''`
+
 6. Set environmental variables for database and application running:
+
 `export APP_SETTINGS="config.DevelopmentConfig"`
+
 `export DATABASE_URL="postgresql://localhost/''database_name''"`
+
 `export TEST_DATABASE_URL="postgresql://localhost/''test_database_name''"`
+
 7. Upgrade database using migrations:
 `python manage.py db upgrade`
 8. Run tests to see if nothing is broken:
