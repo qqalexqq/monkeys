@@ -19,7 +19,7 @@ paramiko==1.15.2
 psycopg2==2.5.4
 py==1.4.26
 pycrypto==2.6.1
-Pygments==2.0.1
+Pygments==2.7.4
 PyHamcrest==1.8.1
 pytest==2.6.4
 pytest-cov==1.8.1
