@@ -26,5 +26,5 @@ pytest-cov==1.8.1
 six==1.8.0
 SQLAlchemy==0.9.8
 urwid==1.3.0
-Werkzeug==0.9.6
+Werkzeug==0.15.3
 WTForms==2.0.1
